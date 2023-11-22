@@ -1,0 +1,42 @@
+import kotlinx.coroutines.*
+import java.io.File
+
+suspend fun downloadFile(url: String, destination: String) {
+    val client = io.ktor.client.HttpClient()
+    val content = client.get<ByteArray>(url)
+    File(destination).writeBytes(content)
+    client.close()
+}
+
+suspend fun downloadFiles(urls: List<String>, destinationFolder: String) {
+    coroutineScope {
+        val jobs = mutableListOf<Job>()
+
+        for ((index, url) in urls.withIndex()) {
+            val destination = "$destinationFolder/file$index.txt"
+            val job = launch {
+                downloadFile(url, destination)
+                println("Downloaded: $url to $destination")
+            }
+            jobs.add(job)
+        }
+
+        jobs.joinAll()
+    }
+}
+
+fun main() = runBlocking {
+    val urls = listOf(
+        "https://example.com/file1.txt",
+        "https://example.com/file2.txt",
+        "https://example.com/file3.txt"
+    )
+
+    val destinationFolder = "downloads"
+
+    File(destinationFolder).mkdirs()
+
+    downloadFiles(urls, destinationFolder)
+
+    println("All downloads completed!")
+}
