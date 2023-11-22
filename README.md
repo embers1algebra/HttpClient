@@ -1,1 +1,1 @@
-# HttpClient
+This Kotlin code uses coroutines and the Ktor HttpClient to download files concurrently. The downloadFiles function takes a list of URLs and a destination folder, and it launches a coroutine for each download. The coroutines run concurrently, and joinAll is used to wait for all downloads to complete.
